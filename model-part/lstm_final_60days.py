@@ -1,13 +1,3 @@
-
-"""
-LSTM-Attention model and prediction utilities.
-
-Classes:
-    0 = Buy
-    1 = Hold
-    2 = Sell
-"""
-
 import numpy as np
 import torch
 from torch import nn
@@ -70,11 +60,6 @@ class LSTMAttention(nn.Module):
 
 
 def predict_from_probs(probabilities, thresholds):
-    """
-    Convert probabilities into Buy/Hold/Sell signals.
-
-    thresholds = (buy_threshold, sell_threshold, margin)
-    """
 
     buy_threshold, sell_threshold, margin = thresholds
 
@@ -106,10 +91,7 @@ def predict_from_probs(probabilities, thresholds):
 
 
 def apply_mode(probabilities, thresholds=None, mode="argmax"):
-    """
-    mode="argmax": choose highest probability.
-    mode="threshold": apply Buy/Sell thresholds.
-    """
+
 
     if mode == "argmax":
         return np.asarray(probabilities).argmax(axis=1).astype(
