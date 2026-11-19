@@ -1,4 +1,3 @@
-
 from pathlib import Path
 
 import numpy as np
@@ -6,11 +5,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 from dataset import RAW_DIR
-
-
-# ============================================================
-# Configuration
-# ============================================================
 
 BASE_DIR = Path(__file__).resolve().parent
 
@@ -30,10 +24,8 @@ SENTINEL = -1e7
 MIN_RETURN_POINTS = 20
 
 
-# ============================================================
-# 1. Cash account
-# ============================================================
 
+# Cash account
 def simulate_cash_account(
     pred,
     open_,
@@ -164,11 +156,7 @@ def simulate_cash_account(
 
     return daily, trades
 
-
-# ============================================================
-# 2. Performance metrics
-# ============================================================
-
+# Performance metrics
 def calculate_metrics(daily):
     """
     Calculate performance from cash-account equity.
@@ -216,11 +204,7 @@ def calculate_metrics(daily):
         "final_equity": float(equity[-1]),
     }
 
-
-# ============================================================
-# 3. Validation evaluation
-# ============================================================
-
+# Validation evaluation
 def evaluate_cash_strategy(pred, open_, dates):
     """
     Used by walkforward.py for checkpoint
@@ -253,10 +237,8 @@ def evaluate_cash_strategy(pred, open_, dates):
     }
 
 
-# ============================================================
-# 4. Single-stock backtest
-# ============================================================
 
+# Single-stock backtest
 def backtest(ticker):
 
     data_path = RAW_DIR / f"{ticker}.csv"
@@ -339,10 +321,7 @@ def backtest(ticker):
     }
 
 
-# ============================================================
-# 5. Single-stock plot
-# ============================================================
-
+# Single-stock plot
 def plot_single(result):
 
     fig, ax = plt.subplots(figsize=(12, 5))
@@ -377,10 +356,8 @@ def plot_single(result):
     plt.close(fig)
 
 
-# ============================================================
-# 6. Sharpe ranking
-# ============================================================
 
+# Sharpe ranking
 def plot_sharpe(report):
 
     data = report.sort_values(
@@ -417,10 +394,7 @@ def plot_sharpe(report):
     plt.close(fig)
 
 
-# ============================================================
-# 7. Run all stocks
-# ============================================================
-
+# run all stocks
 def run_all():
 
     for path in (OUT_DIR, FIG_DIR, ACCOUNT_DIR, TRADE_DIR):
