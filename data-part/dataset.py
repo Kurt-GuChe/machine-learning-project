@@ -1,21 +1,4 @@
 
-"""
-Data engineering for rolling Walk-Forward experiments.
-
-Features:
-    Relative technical indicators (15 features)
-
-Labels:
-    Triple-Barrier classification
-    0 = Buy, 1 = Hold, 2 = Sell
-    -1 = Invalid / unavailable future label
-
-Rolling split:
-    Train: previous 5 years
-    Valid: previous 1 year
-    Test : target year
-"""
-
 from functools import lru_cache
 from pathlib import Path
 
@@ -25,11 +8,6 @@ import pandas as pd
 from indicators import build_features, DEFAULT_PARAMS, FEATURE_COLS
 from labels import make_labels
 
-
-# ============================================================
-# Configuration
-# ============================================================
-
 BASE_DIR = Path(__file__).resolve().parent
 RAW_DIR = BASE_DIR / "data" / "raw"
 
@@ -37,11 +15,7 @@ SEQ_LEN = 60
 TRAIN_YEARS = 5
 LABEL_SLIP = 0.0005
 
-
-# ============================================================
-# 1. Load raw market data
-# ============================================================
-
+#Load market data
 @lru_cache(maxsize=64)
 def load_raw(ticker):
 
@@ -59,10 +33,7 @@ def load_raw(ticker):
 
     return df
 
-
-# ============================================================
-# 2. Relative features
-# ============================================================
+# Relative features
 
 def make_relative_features(features):
 
@@ -124,10 +95,7 @@ def make_relative_features(features):
 
     return f
 
-
-# ============================================================
-# 3. Features and labels
-# ============================================================
+#Features and labels
 
 def load_one(ticker, params=None, window=5, mult=2.0):
     """
@@ -161,10 +129,7 @@ def load_one(ticker, params=None, window=5, mult=2.0):
         subset=FEATURE_COLS
     ).copy()
 
-
-# ============================================================
-# 4. Rolling time boundaries
-# ============================================================
+# Rolling time boundaries
 
 def rolling_dates(test_year, train_years=TRAIN_YEARS):
 
@@ -185,11 +150,7 @@ def rolling_dates(test_year, train_years=TRAIN_YEARS):
     )
 
     return train_start, valid_start, test_start, test_end
-
-
-# ============================================================
-# 5. Rolling DataFrame for Optuna
-# ============================================================
+# Rolling DataFrame for Optuna
 
 def build_rolling_frame(
     ticker,
@@ -199,16 +160,7 @@ def build_rolling_frame(
     test_year,
     train_years=TRAIN_YEARS,
 ):
-    """
-    Return:
-        train_frame, valid_frame, test_frame, scaler
-
-    Used by Optuna / LogisticRegression.
-
-    Train and validation labels must not cross
-    their respective period boundaries.
-    """
-
+    
     frame = load_one(ticker, params, window, mult)
 
     raw_dates = load_raw(ticker).index
@@ -275,9 +227,8 @@ def build_rolling_frame(
     return train, valid, test, (mu, sd)
 
 
-# ============================================================
-# 6. Rolling LSTM sequences
-# ============================================================
+#Rolling LSTM sequences
+
 
 def build_rolling_dataset(
     ticker,
@@ -288,19 +239,7 @@ def build_rolling_dataset(
     train_years=TRAIN_YEARS,
     seq_len=SEQ_LEN,
 ):
-    """
-    Return:
-        train, valid, test, scaler
 
-    Each dataset:
-        X, y, raw_open, raw_close, dates
-
-    X shape:
-        (samples, seq_len, n_features)
-
-    Validation and test sequences may use historical
-    features from preceding periods.
-    """
 
     # Build unscaled full feature history
     frame = load_one(ticker, params, window, mult)
@@ -376,10 +315,7 @@ def build_rolling_dataset(
 
     return train, valid, test, scaler
 
-
-# ============================================================
-# 7. Simple test
-# ============================================================
+# test
 
 if __name__ == "__main__":
 
