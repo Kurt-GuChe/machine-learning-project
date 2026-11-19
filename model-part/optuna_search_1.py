@@ -1,15 +1,3 @@
-
-"""
-Rolling Optuna parameter search.
-
-Train: previous 5 years
-Valid: previous 1 year
-Test : target year (not used in optimization)
-
-Proxy model: LogisticRegression
-Objective: Validation cash-account Sharpe with exponential entry penalty
-"""
-
 import argparse
 import json
 import time
@@ -29,11 +17,6 @@ from backtest import (
     evaluate_cash_strategy,
     SENTINEL,
 )
-
-
-# ============================================================
-# Configuration
-# ============================================================
 
 BASE_DIR = Path(__file__).resolve().parent
 OUT_DIR = BASE_DIR / "best_params"
@@ -59,9 +42,7 @@ PENALTY_K = 0.5
 optuna.logging.set_verbosity(optuna.logging.WARNING)
 
 
-# ============================================================
-# 1. Parameter search space
-# ============================================================
+# Parameter search space
 
 def suggest(trial):
 
@@ -89,9 +70,8 @@ def suggest(trial):
     return params, window, mult
 
 
-# ============================================================
-# 2. Objective
-# ============================================================
+
+# Objective
 
 def objective(trial, ticker, test_year):
 
@@ -194,9 +174,7 @@ def objective(trial, ticker, test_year):
     return float(score)
 
 
-# ============================================================
-# 3. Search one stock and year
-# ============================================================
+# Search one stock and year
 
 def search_one(ticker, test_year, n_trials=MAX_TRIALS):
 
@@ -232,10 +210,8 @@ def search_one(ticker, test_year, n_trials=MAX_TRIALS):
                 and trial.value > SENTINEL / 2
             )
         ]
-
-    # --------------------------------------------------------
-    # Search with early stopping
-    # --------------------------------------------------------
+    # early stopping
+  
 
     completed = []
 
@@ -262,15 +238,11 @@ def search_one(ticker, test_year, n_trials=MAX_TRIALS):
             best_entries = int(
                 best_trial.user_attrs.get("entries", 0)
             )
-
             # Early stopping:
             # best trial has more than 5 real entries
             if best_entries > EARLY_STOP_ENTRIES:
                 break
-
-    # --------------------------------------------------------
     # Handle no valid trial
-    # --------------------------------------------------------
 
     if not completed:
 
@@ -287,12 +259,9 @@ def search_one(ticker, test_year, n_trials=MAX_TRIALS):
         )
 
         print("Failure reasons:", dict(reasons))
-
         return None
 
-    # --------------------------------------------------------
     # Select best trial by penalized score
-    # --------------------------------------------------------
 
     best_trial = max(
         completed,
@@ -336,9 +305,7 @@ def search_one(ticker, test_year, n_trials=MAX_TRIALS):
     return best
 
 
-# ============================================================
-# 4. Rolling search
-# ============================================================
+# Rolling search
 
 def search_all(tickers, start_year, end_year, n_trials):
 
@@ -411,9 +378,7 @@ def search_all(tickers, start_year, end_year, n_trials):
     )
 
 
-# ============================================================
-# 5. Main
-# ============================================================
+# Main
 
 def main():
 
