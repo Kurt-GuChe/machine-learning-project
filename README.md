@@ -3,3 +3,4 @@
 # Programming for Artificial Intelligence and Machine Learning 2
 # Stock Price Pattern Recognition and Transfer Learning Based on Attention Mechanisms and Hyperparameter Optimisation
 # Qingwen Gu
+# Please note: As the source files for this code are running on my local computer, all path dependencies in the code files are based on my own system. I have made some adjustments to the code, but there may still be some oversights.
