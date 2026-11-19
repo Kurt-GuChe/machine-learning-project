@@ -1,15 +1,3 @@
-
-"""
-Annual Walk-Forward LSTM-Attention
-
-2022: Train 2016-2020, Valid 2021, Test 2022
-2023+: Inherit previous year's best weights.
-
-Model selection: Validation cash-account Sharpe
-Trading: Buy 100%, Hold, Sell 100%
-No bull/bear market strategy.
-"""
-
 import argparse
 import json
 import time
@@ -24,11 +12,6 @@ from torch.utils.data import DataLoader, TensorDataset
 from dataset import FEATURE_COLS, SEQ_LEN, build_rolling_dataset
 from backtest import SENTINEL, evaluate_cash_strategy
 from lstm_final_60days import LSTMAttention, apply_mode
-
-
-# ============================================================
-# 1. Configuration
-# ============================================================
 
 BASE_DIR = Path(__file__).resolve().parent
 PARAM_DIR = BASE_DIR / "best_params"
@@ -66,10 +49,8 @@ TARGET_ENTRIES = 5
 PENALTY_LAMBDA = 0.1
 PENALTY_K = 0.5
 
-# ============================================================
-# 2. Utilities
-# ============================================================
 
+# Utilities
 def set_seed():
     np.random.seed(SEED)
     torch.manual_seed(SEED)
@@ -159,9 +140,8 @@ def calculate_validation_score(sharpe, entries):
     return float(score), float(penalty)
 
 
-# ============================================================
-# 3. Validation strategy selection
-# ============================================================
+
+# Validation strategy selection
 
 def select_validation_strategy(probs, open_, dates):
     """
@@ -229,9 +209,9 @@ def select_validation_strategy(probs, open_, dates):
     return best
 
 
-# ============================================================
-# 4. Train / Fine-tune one year
-# ============================================================
+
+# Train in Fine-tune one year
+
 
 def train_year(model, train, valid, first_year=False):
 
@@ -439,9 +419,9 @@ def train_year(model, train, valid, first_year=False):
     )
 
 
-# ============================================================
-# 5. Walk-Forward one stock
-# ============================================================
+
+# Walk-Forward
+
 
 def run_stock(
     ticker,
@@ -713,9 +693,9 @@ def run_stock(
     return yearly_rows
 
 
-# ============================================================
-# 6. Main
-# ============================================================
+
+# Main
+
 
 def main():
 
